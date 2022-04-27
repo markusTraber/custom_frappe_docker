@@ -43,6 +43,12 @@ jobs:
         id: get-repo
         run: echo "::set-output name=REPOSITORY::${GITHUB_REPOSITORY#*/}"
 
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
+        env:
+          OWNER: '${{ github.repository_owner }}'
+
       - name: Push
         uses: docker/bake-action@v1.7.0
         with:
@@ -52,7 +58,7 @@ jobs:
         env:
           FRAPPE_VERSION: ${{ steps.get-base-versions.outputs.FRAPPE_VERSION }}
           ERPNEXT_VERSION: ${{ steps.get-base-versions.outputs.ERPNEXT_VERSION }}
-          REGISTRY_NAME: ghcr.io/${{ github.repository_owner }}
+          REGISTRY_NAME: ghcr.io/${{ OWNER_LC }}
           VERSION: latest
           BACKEND_IMAGE_NAME: ${{ steps.get-repo.outputs.REPOSITORY }}/worker
           FRONTEND_IMAGE_NAME: ${{ steps.get-repo.outputs.REPOSITORY }}/nginx
